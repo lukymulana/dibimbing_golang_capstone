@@ -3,6 +3,7 @@ package repository
 import (
 	"dibimbing_golang_capstone/config"
 	"dibimbing_golang_capstone/entity"
+	"gorm.io/gorm"
 )
 
 type UserRepository interface {
@@ -10,10 +11,15 @@ type UserRepository interface {
 	GetUserByUsername(username string) (*entity.User, error)
 }
 
-type userRepository struct{}
+// instance third party
+type userRepository struct{
+	db *gorm.DB
+} 
 
-func NewUserRepository() UserRepository {
-	return &userRepository{}
+func NewUserRepository(db *gorm.DB) UserRepository {
+	return &userRepository{
+		db: db,
+	}
 }
 
 func (r *userRepository) CreateUser(user *entity.User) error {
