@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"dibimbing_golang_capstone/dto"
 	"dibimbing_golang_capstone/service"
+	"dibimbing_golang_capstone/repository"
 	"github.com/gin-gonic/gin"
 )
 
@@ -16,6 +17,12 @@ func NewTripController(tripService service.TripService) TripController {
 }
 
 func (c *TripController) CreateTrip(ctx *gin.Context) {
+	role := ctx.MustGet("role").(string)
+	if role != "guide" {
+		ctx.JSON(http.StatusForbidden, gin.H{"error": "Only guide can create trip"})
+		return
+	}
+
 	var tripDTO dto.CreateTripDTO
 	if err := ctx.ShouldBindJSON(&tripDTO); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -34,6 +41,12 @@ func (c *TripController) CreateTrip(ctx *gin.Context) {
 }
 
 func (c *TripController) UpdateTrip(ctx *gin.Context) {
+	role := ctx.MustGet("role").(string)
+	if role != "guide" {
+		ctx.JSON(http.StatusForbidden, gin.H{"error": "Only guide can update trip"})
+		return
+	}
+
 	id := ctx.Param("id")
 	var tripDTO dto.CreateTripDTO
 	if err := ctx.ShouldBindJSON(&tripDTO); err != nil {
@@ -50,6 +63,12 @@ func (c *TripController) UpdateTrip(ctx *gin.Context) {
 }
 
 func (c *TripController) DeleteTrip(ctx *gin.Context) {
+	role := ctx.MustGet("role").(string)
+	if role != "guide" {
+		ctx.JSON(http.StatusForbidden, gin.H{"error": "Only guide can delete trip"})
+		return
+	}
+
 	id := ctx.Param("id")
 	userID := ctx.MustGet("userID").(uint)
 	if err := c.tripService.DeleteTrip(id, userID); err != nil {
@@ -100,7 +119,20 @@ func (c *TripController) GetTripByID(ctx *gin.Context) {
 		ctx.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
 		return
 	}
-	ctx.JSON(http.StatusOK, gin.H{"trip": trip})
+
+	// Hitung sisa kuota
+	bookingService := service.NewBookingService(repository.NewBookingRepository())
+	bookings, err := bookingService.GetBookingsByTripID(trip.TripID)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	sisaKuota := trip.Capacity - len(bookings)
+
+	ctx.JSON(http.StatusOK, gin.H{
+		"trip": trip,
+		"sisa_kuota": sisaKuota,
+	})
 }
 
 

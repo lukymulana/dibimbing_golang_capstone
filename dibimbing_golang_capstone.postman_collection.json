@@ -1,0 +1,317 @@
+{
+	"info": {
+		"_postman_id": "eba85f69-ebd5-42fa-8dc4-0506756440fc",
+		"name": "Dibimbing Golang Capstone API Copy",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json",
+		"_exporter_id": "12386610"
+	},
+	"item": [
+		{
+			"name": "User Register",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"username\": \"traveler2\",\n  \"email\": \"traveler2@example.com\",\n  \"password\": \"123\",\n  \"role\": \"traveler\"\n}"
+				},
+				"url": "{{base_url}}/register"
+			},
+			"response": []
+		},
+		{
+			"name": "User Login",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"email\": \"test@example.com\",\n  \"password\": \"password123\"\n}"
+				},
+				"url": "{{base_url}}/login"
+			},
+			"response": []
+		},
+		{
+			"name": "List Trips (Public)",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": "{{base_url}}/trips"
+			},
+			"response": []
+		},
+		{
+			"name": "Get Trip By ID (Public)",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": "{{base_url}}/trips/1"
+			},
+			"response": []
+		},
+		{
+			"name": "Filter Trips (Public)",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/trips/filter?city=Jakarta&start_date=2025-05-01&end_date=2025-05-05",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"trips",
+						"filter"
+					],
+					"query": [
+						{
+							"key": "city",
+							"value": "Jakarta"
+						},
+						{
+							"key": "start_date",
+							"value": "2025-05-01"
+						},
+						{
+							"key": "end_date",
+							"value": "2025-05-05"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create Trip (Auth)",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"city\": \"Jakarta\",\n  \"start_date\": \"2025-05-01\",\n  \"end_date\": \"2025-05-05\",\n  \"capacity\": 10,\n  \"price\": 500000,\n  \"description\": \"Liburan seru di Jakarta\"\n}"
+				},
+				"url": "{{base_url}}/auth/trips"
+			},
+			"response": []
+		},
+		{
+			"name": "Update Trip (Auth)",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"city\": \"Jakarta\",\n  \"start_date\": \"2025-05-01\",\n  \"end_date\": \"2025-05-05\",\n  \"capacity\": 10,\n  \"price\": 500000,\n  \"description\": \"Liburan seru di Jakarta\"\n}"
+				},
+				"url": "{{base_url}}/auth/trips/1"
+			},
+			"response": []
+		},
+		{
+			"name": "Delete Trip (Auth)",
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}"
+					}
+				],
+				"url": "{{base_url}}/auth/trips/1"
+			},
+			"response": []
+		},
+		{
+			"name": "List My Trips (Auth)",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}"
+					}
+				],
+				"url": "{{base_url}}/auth/my-trips"
+			},
+			"response": []
+		},
+		{
+			"name": "Create Booking (Traveler)",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"TripID\": 1\n}"
+				},
+				"url": "{{base_url}}/auth/bookings"
+			},
+			"response": []
+		},
+		{
+			"name": "Get Bookings by Trip (Auth)",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}"
+					}
+				],
+				"url": "{{base_url}}/auth/bookings/1"
+			},
+			"response": [
+				{
+					"name": "Success",
+					"originalRequest": {
+						"method": "GET",
+						"header": [],
+						"url": ""
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [],
+					"cookie": [],
+					"body": "[\n  {\n    \"booking_id\": 1,\n    \"booking_status\": \"waiting\",\n    \"created_at\": \"2025-04-26T14:30:00+07:00\",\n    \"user_id\": 2,\n    \"username\": \"traveler1\",\n    \"email\": \"traveler1@mail.com\",\n    \"trip_id\": 1,\n    \"city\": \"Bandung\",\n    \"start_date\": \"2025-05-01\",\n    \"end_date\": \"2025-05-03\"\n  },\n  {\n    \"booking_id\": 2,\n    \"booking_status\": \"waiting\",\n    \"created_at\": \"2025-04-26T14:31:00+07:00\",\n    \"user_id\": 3,\n    \"username\": \"traveler2\",\n    \"email\": \"traveler2@mail.com\",\n    \"trip_id\": 1,\n    \"city\": \"Bandung\",\n    \"start_date\": \"2025-05-01\",\n    \"end_date\": \"2025-05-03\"\n  }\n]"
+				}
+			]
+		},
+		{
+			"name": "Get Bookings by Guide (Auth)",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}"
+					}
+				],
+				"url": "{{base_url}}/auth/guide/bookings"
+			},
+			"response": [
+				{
+					"name": "Success",
+					"originalRequest": {
+						"method": "GET",
+						"header": [],
+						"url": ""
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [],
+					"cookie": [],
+					"body": "[\n  {\n    \"booking_id\": 1,\n    \"booking_status\": \"waiting\",\n    \"created_at\": \"2025-04-26T14:30:00+07:00\",\n    \"user_id\": 2,\n    \"username\": \"traveler1\",\n    \"email\": \"traveler1@mail.com\",\n    \"trip_id\": 1,\n    \"city\": \"Bandung\",\n    \"start_date\": \"2025-05-01\",\n    \"end_date\": \"2025-05-03\"\n  }\n]"
+				}
+			]
+		},
+		{
+			"name": "Update Booking Status (Guide)",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"status\": \"success\"\n}"
+				},
+				"url": "{{base_url}}/auth/guide/bookings/1"
+			},
+			"response": [
+				{
+					"name": "Success",
+					"originalRequest": {
+						"method": "GET",
+						"header": [],
+						"url": ""
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [],
+					"cookie": [],
+					"body": "{\n  \"message\": \"Booking status updated successfully\"\n}"
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost:8081"
+		},
+		{
+			"key": "token",
+			"value": ""
+		}
+	]
+}

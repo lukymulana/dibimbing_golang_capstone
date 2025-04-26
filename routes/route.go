@@ -47,5 +47,9 @@ func SetupRoutes(r *gin.Engine) {
 		auth.GET("/my-trips", tripController.GetMyTrips)
 		auth.POST("/bookings", bookingController.CreateBooking)
 		auth.GET("/bookings/:trip_id", bookingController.GetBookingsByTripID)
+
+		// Guide features
+		auth.GET("/guide/bookings", bookingController.GetBookingsByGuideID)
+		auth.PUT("/guide/bookings/:booking_id", bookingController.UpdateBookingStatus)
 	}
 }

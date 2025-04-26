@@ -41,7 +41,14 @@ func AuthMiddleware() gin.HandlerFunc {
 
         if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
             userID := uint(claims["user_id"].(float64))
+            role, ok := claims["role"].(string)
+            if !ok {
+                ctx.JSON(http.StatusUnauthorized, gin.H{"error": "Role not found in token"})
+                ctx.Abort()
+                return
+            }
             ctx.Set("userID", userID)
+            ctx.Set("role", role)
             ctx.Next()
         } else {
             ctx.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid token claims"})
@@ -53,6 +60,7 @@ func AuthMiddleware() gin.HandlerFunc {
 func GenerateToken(user *entity.User) (string, error) {
     claims := jwt.MapClaims{
         "user_id": user.UserID,
+        "role":    user.Role,
         "exp":     time.Now().Add(time.Hour * 72).Unix(),
     }
 

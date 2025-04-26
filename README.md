@@ -79,6 +79,7 @@ Authorization: Bearer <jwt_token>
 #### 4. Create Trip
 - **Endpoint:** `POST /auth/trips`
 - **Deskripsi:** Membuat trip baru.
+- **Role:** Only **Guide**
 - **Request Body:**
 ```json
 {
@@ -106,6 +107,7 @@ Authorization: Bearer <jwt_token>
 #### 5. Update Trip
 - **Endpoint:** `PUT /auth/trips/:id`
 - **Deskripsi:** Mengedit trip yang dibuat oleh user login.
+- **Role:** Only **Guide**
 - **Request Body:** (sama seperti create)
 - **Response Sukses:**
 ```json
@@ -123,6 +125,7 @@ Authorization: Bearer <jwt_token>
 #### 6. Delete Trip
 - **Endpoint:** `DELETE /auth/trips/:id`
 - **Deskripsi:** Menghapus trip yang dibuat oleh user login.
+- **Role:** Only **Guide**
 - **Response Sukses:**
 ```json
 {
@@ -148,25 +151,81 @@ Authorization: Bearer <jwt_token>
 ]
 ```
 
-#### 8. Create Booking
+#### 8. Create Booking (Traveler)
 - **Endpoint:** `POST /auth/bookings`
-- **Deskripsi:** Membuat booking untuk trip tertentu.
+- **Deskripsi:** Traveler melakukan booking untuk trip tertentu.
+- **Role:** Only **Traveler**
 - **Request Body:**
 ```json
 {
-  "trip_id": 1
+  "TripID": 1
 }
 ```
 - **Response Sukses:**
 ```json
 {
-  "id": 1,
-  "trip_id": 1,
-  "user_id": 2
+  "booking": {
+    "BookingID": 1,
+    "UserID": 2,
+    "TripID": 1,
+    "BookingStatus": "waiting",
+    "CreatedAt": "2025-04-26T14:30:00+07:00"
+  }
+}
+```
+- **Validasi:**
+  - Hanya user dengan role traveler yang dapat booking trip.
+  - Booking hanya bisa dilakukan jika kuota trip masih tersedia (`sisa_kuota > 0`).
+  - Jika kuota penuh akan mendapat error:
+    ```json
+    { "error": "Trip is fully booked" }
+    ```
+- **Catatan:**
+  - Traveler dapat melihat sisa kuota trip pada endpoint detail trip (`GET /trips/:id`).
+
+#### 10. Get Bookings by Guide (Konfirmasi Booking)
+- **Endpoint:** `GET /auth/guide/bookings`
+- **Deskripsi:** Guide melihat seluruh booking untuk trip yang dimilikinya (hasil join detail).
+- **Autentikasi:** Hanya untuk user dengan role guide (Authorization: Bearer {{token}})
+- **Response Sukses:**
+```json
+[
+  {
+    "booking_id": 1,
+    "booking_status": "waiting",
+    "created_at": "2025-04-26T14:30:00+07:00",
+    "user_id": 2,
+    "username": "traveler1",
+    "email": "traveler1@mail.com",
+    "trip_id": 1,
+    "city": "Bandung",
+    "start_date": "2025-05-01",
+    "end_date": "2025-05-03"
+  }
+]
+```
+
+#### 11. Update Booking Status (Konfirmasi oleh Guide)
+- **Endpoint:** `PUT /auth/guide/bookings/:booking_id`
+- **Deskripsi:** Guide mengubah status booking (misal dari waiting menjadi success) untuk trip miliknya.
+- **Autentikasi:** Hanya untuk user dengan role guide (Authorization: Bearer {{token}})
+- **Request Body:**
+```json
+{
+  "status": "success"
+}
+```
+- **Validasi:**
+  - Hanya guide pemilik trip yang bisa mengubah status booking
+  - Status hanya bisa diubah ke `success` atau `waiting`
+- **Response Sukses:**
+```json
+{
+  "message": "Booking status updated successfully"
 }
 ```
 
-#### 7. Get Bookings by Trip
+#### 9. Get Bookings by Trip
 - **Endpoint:** `GET /auth/bookings/:trip_id`
 - **Deskripsi:** Mendapatkan daftar booking berdasarkan trip id.
 - **Response Sukses:**
