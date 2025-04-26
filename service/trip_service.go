@@ -7,8 +7,13 @@ import (
 )
 
 type TripService interface {
+	GetTripsByUserID(userID uint) ([]entity.Trip, error)
 	CreateTrip(tripDTO dto.CreateTripDTO, userID uint) (*entity.Trip, error)
 	GetTripsByCityAndDate(city, startDate, endDate string) ([]entity.Trip, error)
+	GetAllTrips() ([]entity.Trip, error)
+	GetTripByID(id string) (*entity.Trip, error)
+	UpdateTrip(id string, tripDTO dto.CreateTripDTO, userID uint) (*entity.Trip, error)
+	DeleteTrip(id string, userID uint) error
 }
 
 type tripService struct {
@@ -40,3 +45,24 @@ func (s *tripService) CreateTrip(tripDTO dto.CreateTripDTO, userID uint) (*entit
 func (s *tripService) GetTripsByCityAndDate(city, startDate, endDate string) ([]entity.Trip, error) {
 	return s.tripRepository.GetTripsByCityAndDate(city, startDate, endDate)
 }
+
+func (s *tripService) GetAllTrips() ([]entity.Trip, error) {
+	return s.tripRepository.GetAllTrips()
+}
+
+func (s *tripService) GetTripByID(id string) (*entity.Trip, error) {
+	return s.tripRepository.GetTripByID(id)
+}
+
+func (s *tripService) UpdateTrip(id string, tripDTO dto.CreateTripDTO, userID uint) (*entity.Trip, error) {
+	return s.tripRepository.UpdateTrip(id, tripDTO, userID)
+}
+
+func (s *tripService) DeleteTrip(id string, userID uint) error {
+	return s.tripRepository.DeleteTrip(id, userID)
+}
+
+func (s *tripService) GetTripsByUserID(userID uint) ([]entity.Trip, error) {
+	return s.tripRepository.GetTripsByUserID(userID)
+}
+
