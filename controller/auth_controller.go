@@ -3,7 +3,6 @@ package controller
 import (
 	"net/http"
 	"dibimbing_golang_capstone/dto"
-	"dibimbing_golang_capstone/entity"
 	"dibimbing_golang_capstone/repository"
 	"dibimbing_golang_capstone/middleware"
 	"golang.org/x/crypto/bcrypt"
@@ -19,7 +18,7 @@ func NewAuthController(userRepository repository.UserRepository) AuthController 
 }
 
 func (c *AuthController) Login(ctx *gin.Context) {
-	var loginDTO dto.CreateUserDTO
+	var loginDTO dto.LoginDTO
 	if err := ctx.ShouldBindJSON(&loginDTO); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
