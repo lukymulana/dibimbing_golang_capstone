@@ -9,8 +9,22 @@ import (
 
 var DB *gorm.DB
 
+func buildDSN() string {
+	dsn := GetEnv("DB_DSN", "")
+	if dsn != "" {
+		return dsn
+	}
+	host := GetEnv("DB_HOST", "localhost")
+	port := GetEnv("DB_PORT", "3306")
+	user := GetEnv("DB_USER", "root")
+	password := GetEnv("DB_PASSWORD", "")
+	dbname := GetEnv("DB_NAME", "travel_booking")
+	return user + ":" + password + "@tcp(" + host + ":" + port + ")/" + dbname + "?charset=utf8mb4&parseTime=True&loc=Local"
+}
+
 func InitDB() *gorm.DB {
-	dsn := "root:@tcp(127.0.0.1:3306)/travel_booking?charset=utf8mb4&parseTime=True&loc=Local"
+	LoadEnv()
+	dsn := buildDSN()
 	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
 	if err != nil {
 		log.Fatal("Failed to connect to database:", err)

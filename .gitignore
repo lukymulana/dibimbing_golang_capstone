@@ -1,0 +1,31 @@
+# Binaries
+/app
+app
+*.exe
+*.out
+*.test
+
+# Vendor
+/vendor/
+
+# IDE/editor
+.idea/
+.vscode/
+*.swp
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Env/Secrets
+.env
+
+# Logs
+*.log
+
+# Database
+*.sqlite
+*.db
+
+# Docker
+/db_data/
