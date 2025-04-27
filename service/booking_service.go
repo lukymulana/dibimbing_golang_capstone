@@ -17,16 +17,17 @@ type BookingService interface {
 
 type bookingService struct {
 	bookingRepository repository.BookingRepository
+	tripRepository    repository.TripRepository
+	userRepository    repository.UserRepository
 }
 
-func NewBookingService(bookingRepository repository.BookingRepository) BookingService {
-	return &bookingService{bookingRepository}
+func NewBookingService(bookingRepository repository.BookingRepository, tripRepository repository.TripRepository, userRepository repository.UserRepository) BookingService {
+	return &bookingService{bookingRepository, tripRepository, userRepository}
 }
 
 func (s *bookingService) CreateBooking(bookingDTO dto.CreateBookingDTO, userID uint) (*entity.Booking, error) {
 	// Ambil trip terkait
-	tripRepo := repository.NewTripRepository()
-	trip, err := tripRepo.GetTripByID(strconv.Itoa(int(bookingDTO.TripID)))
+	trip, err := s.tripRepository.GetTripByID(strconv.Itoa(int(bookingDTO.TripID)))
 	if err != nil {
 		return nil, err
 	}
@@ -64,12 +65,16 @@ func (s *bookingService) GetBookingsByGuideID(guideID uint) ([]dto.BookingDetail
 	if err != nil {
 		return nil, err
 	}
-	userRepo := repository.NewUserRepository(nil)
-	tripRepo := repository.NewTripRepository()
 	var details []dto.BookingDetailDTO
 	for _, b := range bookings {
-		user, _ := userRepo.GetUserByID(b.UserID)
-		trip, _ := tripRepo.GetTripByID(strconv.Itoa(int(b.TripID)))
+		user, errUser := s.userRepository.GetUserByID(b.UserID)
+		if errUser != nil || user == nil {
+			continue // skip jika user tidak ditemukan
+		}
+		trip, errTrip := s.tripRepository.GetTripByID(strconv.Itoa(int(b.TripID)))
+		if errTrip != nil || trip == nil {
+			continue // skip jika trip tidak ditemukan
+		}
 		details = append(details, dto.BookingDetailDTO{
 			BookingID:     b.BookingID,
 			BookingStatus: b.BookingStatus,
@@ -112,13 +117,16 @@ func (s *bookingService) GetBookingsByTripID(tripID uint) ([]dto.BookingDetailDT
 	if err != nil {
 		return nil, err
 	}
-	// Join ke User dan Trip
-	userRepo := repository.NewUserRepository(nil)
-	tripRepo := repository.NewTripRepository()
 	var details []dto.BookingDetailDTO
 	for _, b := range bookings {
-		user, _ := userRepo.GetUserByID(b.UserID)
-		trip, _ := tripRepo.GetTripByID(strconv.Itoa(int(b.TripID)))
+		user, errUser := s.userRepository.GetUserByID(b.UserID)
+		if errUser != nil || user == nil {
+			continue // skip jika user tidak ditemukan
+		}
+		trip, errTrip := s.tripRepository.GetTripByID(strconv.Itoa(int(b.TripID)))
+		if errTrip != nil || trip == nil {
+			continue // skip jika trip tidak ditemukan
+		}
 		details = append(details, dto.BookingDetailDTO{
 			BookingID:     b.BookingID,
 			BookingStatus: b.BookingStatus,

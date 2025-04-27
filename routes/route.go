@@ -13,17 +13,17 @@ import (
 func SetupRoutes(r *gin.Engine) {
 	// Initialize repositories
 	userRepo := repository.NewUserRepository(config.DB) // penerapan dependencies injection
-	tripRepo := repository.NewTripRepository()
-	bookingRepo := repository.NewBookingRepository()
+	tripRepo := repository.NewTripRepository(config.DB)
+	bookingRepo := repository.NewBookingRepository(config.DB)
 
 	// Initialize services
 	userService := service.NewUserService(userRepo)
 	tripService := service.NewTripService(tripRepo)
-	bookingService := service.NewBookingService(bookingRepo)
+	bookingService := service.NewBookingService(bookingRepo, tripRepo, userRepo)
 
 	// Initialize controllers
 	userController := controller.NewUserController(userService)
-	tripController := controller.NewTripController(tripService)
+	tripController := controller.NewTripController(tripService, bookingService)
 	bookingController := controller.NewBookingController(bookingService)
 	authController := controller.NewAuthController(userRepo)
 

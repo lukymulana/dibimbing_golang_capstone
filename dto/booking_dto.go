@@ -1,5 +1,7 @@
 package dto
 
+import "time"
+
 type CreateBookingDTO struct {
 	TripID uint `json:"trip_id" binding:"required"`
 }
@@ -14,7 +16,7 @@ type UpdateBookingStatusDTO struct {
 type BookingDetailDTO struct {
     BookingID     uint   `json:"booking_id"`
     BookingStatus string `json:"booking_status"`
-    CreatedAt     string `json:"created_at"`
+    CreatedAt     time.Time `json:"created_at"`
     // Info User
     UserID        uint   `json:"user_id"`
     Username      string `json:"username"`

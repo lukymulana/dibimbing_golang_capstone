@@ -5,6 +5,7 @@ import (
 	"dibimbing_golang_capstone/entity"
 	"dibimbing_golang_capstone/dto"
 	"errors"
+	"gorm.io/gorm"
 )
 
 type TripRepository interface {
@@ -17,19 +18,21 @@ type TripRepository interface {
 	DeleteTrip(id string, userID uint) error
 }
 
-type tripRepository struct{}
+type tripRepository struct {
+	db *gorm.DB
+}
 
-func NewTripRepository() TripRepository {
-	return &tripRepository{}
+func NewTripRepository(db *gorm.DB) TripRepository {
+	return &tripRepository{db}
 }
 
 func (r *tripRepository) CreateTrip(trip *entity.Trip) error {
-	return config.DB.Create(trip).Error
+	return r.db.Create(trip).Error
 }
 
 func (r *tripRepository) GetAllTrips() ([]entity.Trip, error) {
 	var trips []entity.Trip
-	if err := config.DB.Find(&trips).Error; err != nil {
+	if err := r.db.Find(&trips).Error; err != nil {
 		return nil, err
 	}
 	return trips, nil
@@ -37,7 +40,7 @@ func (r *tripRepository) GetAllTrips() ([]entity.Trip, error) {
 
 func (r *tripRepository) GetTripByID(id string) (*entity.Trip, error) {
 	var trip entity.Trip
-	if err := config.DB.First(&trip, id).Error; err != nil {
+	if err := r.db.First(&trip, id).Error; err != nil {
 		return nil, err
 	}
 	return &trip, nil
@@ -45,7 +48,7 @@ func (r *tripRepository) GetTripByID(id string) (*entity.Trip, error) {
 
 func (r *tripRepository) UpdateTrip(id string, tripDTO dto.CreateTripDTO, userID uint) (*entity.Trip, error) {
 	var trip entity.Trip
-	if err := config.DB.First(&trip, id).Error; err != nil {
+	if err := r.db.First(&trip, id).Error; err != nil {
 		return nil, err
 	}
 	if trip.UserID != userID {
@@ -57,7 +60,7 @@ func (r *tripRepository) UpdateTrip(id string, tripDTO dto.CreateTripDTO, userID
 	trip.Capacity = tripDTO.Capacity
 	trip.Price = tripDTO.Price
 	trip.Description = tripDTO.Description
-	if err := config.DB.Save(&trip).Error; err != nil {
+	if err := r.db.Save(&trip).Error; err != nil {
 		return nil, err
 	}
 	return &trip, nil
@@ -65,13 +68,13 @@ func (r *tripRepository) UpdateTrip(id string, tripDTO dto.CreateTripDTO, userID
 
 func (r *tripRepository) DeleteTrip(id string, userID uint) error {
 	var trip entity.Trip
-	if err := config.DB.First(&trip, id).Error; err != nil {
+	if err := r.db.First(&trip, id).Error; err != nil {
 		return err
 	}
 	if trip.UserID != userID {
 		return errors.New("unauthorized: you can only delete your own trip")
 	}
-	if err := config.DB.Delete(&trip).Error; err != nil {
+	if err := r.db.Delete(&trip).Error; err != nil {
 		return err
 	}
 	return nil
@@ -79,7 +82,7 @@ func (r *tripRepository) DeleteTrip(id string, userID uint) error {
 
 func (r *tripRepository) GetTripsByUserID(userID uint) ([]entity.Trip, error) {
 	var trips []entity.Trip
-	if err := config.DB.Where("user_id = ?", userID).Find(&trips).Error; err != nil {
+	if err := r.db.Where("user_id = ?", userID).Find(&trips).Error; err != nil {
 		return nil, err
 	}
 	return trips, nil

@@ -1,19 +1,20 @@
 package controller
 
 import (
-	"net/http"
 	"dibimbing_golang_capstone/dto"
 	"dibimbing_golang_capstone/service"
-	"dibimbing_golang_capstone/repository"
+	"net/http"
+
 	"github.com/gin-gonic/gin"
 )
 
 type TripController struct {
-	tripService service.TripService
+	tripService    service.TripService
+	bookingService service.BookingService
 }
 
-func NewTripController(tripService service.TripService) TripController {
-	return TripController{tripService}
+func NewTripController(tripService service.TripService, bookingService service.BookingService) TripController {
+	return TripController{tripService, bookingService}
 }
 
 func (c *TripController) CreateTrip(ctx *gin.Context) {
@@ -102,7 +103,6 @@ func (c *TripController) GetTripsByCityAndDate(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, gin.H{"trips": trips})
 }
 
-
 func (c *TripController) GetAllTrips(ctx *gin.Context) {
 	trips, err := c.tripService.GetAllTrips()
 	if err != nil {
@@ -121,8 +121,9 @@ func (c *TripController) GetTripByID(ctx *gin.Context) {
 	}
 
 	// Hitung sisa kuota
-	bookingService := service.NewBookingService(repository.NewBookingRepository())
-	bookings, err := bookingService.GetBookingsByTripID(trip.TripID)
+	// bookingService harus di-inject, bukan dibuat di sini. Saran: tambahkan field bookingService pada TripController dan inject dari routes.
+	// Berikut solusi DI-friendly:
+	bookings, err := c.bookingService.GetBookingsByTripID(trip.TripID)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -130,9 +131,7 @@ func (c *TripController) GetTripByID(ctx *gin.Context) {
 	sisaKuota := trip.Capacity - len(bookings)
 
 	ctx.JSON(http.StatusOK, gin.H{
-		"trip": trip,
+		"trip":       trip,
 		"sisa_kuota": sisaKuota,
 	})
 }
-
-

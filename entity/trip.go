@@ -1,5 +1,6 @@
 package entity
 
+import "time"
 type Trip struct {
 	TripID      uint   `gorm:"primaryKey"`
 	UserID      uint   `gorm:"foreignKey:UserID"`
@@ -9,7 +10,7 @@ type Trip struct {
 	Capacity    int
 	Price       float64
 	Description string
-	CreatedAt   string
-	UpdatedAt   string
-	DeletedAt   string
+	CreatedAt   time.Time      `gorm:"autoCreateTime"`
+	UpdatedAt   time.Time      `gorm:"autoUpdateTime"`
+	DeletedAt   *time.Time     `gorm:"index"`
 }
